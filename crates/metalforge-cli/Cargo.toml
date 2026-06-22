@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+[package]
+name = "metalforge-cli"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "CLI for metalForge hardware topology testing suite"
+
+[[bin]]
+name = "metalforge"
+path = "src/main.rs"
+
+[dependencies]
+metalforge-types = { workspace = true }
+metalforge-probes = { workspace = true }
+clap = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+
+[lints]
+workspace = true

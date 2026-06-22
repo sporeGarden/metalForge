@@ -1,0 +1,19 @@
+# metalForge Remediation Playbooks
+# Maps known drift patterns to automated fix procedures.
+# Used by the remediation engine when --remediate is passed.
+
+[playbooks.flint2_ssid_wipe]
+description = "GL-MT6000 firmware update overwrites SSID/auth in MediaTek .dat files"
+trigger = "SSID1 field empty or mismatched in b0.dat/b1.dat"
+device_type = "wifi_ap"
+model_match = "GL-MT6000"
+actions = [
+    "sed -i 's/^SSID1=.*/SSID1={expected_ssid}/' {dat_path}",
+    "sed -i 's/^AuthMode=.*/AuthMode={expected_auth}/' {dat_path}",
+    "sed -i 's/^EncrypType=.*/EncrypType={expected_encryp}/' {dat_path}",
+    "sed -i 's/^WPAPSK1=.*/WPAPSK1={psk}/' {dat_path}",
+    "wifi reload",
+]
+severity = "high"
+first_seen = "2026-06-22"
+note = "Observed twice: initial setup and after firmware update/reboot."

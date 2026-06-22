@@ -1,0 +1,83 @@
+# metalForge Device Registry
+# Declares all infrastructure hardware in the topology.
+# Probes validate the physical world matches these declarations.
+#
+# Secrets (WiFi PSK, etc.) are NEVER stored here.
+# Use METALFORGE_WIFI_PSK env var for WiFi password validation.
+
+# ─────────────────────────────────────────────────────────────
+# WiFi Access Points
+# ─────────────────────────────────────────────────────────────
+
+[devices.flint2_house2]
+type = "wifi_ap"
+model = "GL-MT6000"
+firmware = "openwrt"
+ip = "192.168.4.250"
+ssh_user = "root"
+site = "house2"
+note = "MediaTek driver reads .dat files for radio config; firmware updates can overwrite SSID/auth fields"
+
+[devices.flint2_house2.radios.band_2g]
+dat_path = "/etc/wireless/mediatek/mt7986-ax6000.dbdc.b0.dat"
+ssid = "ApertureScience"
+auth_mode = "WPA2PSK"
+encryp_type = "AES"
+
+[devices.flint2_house2.radios.band_5g]
+dat_path = "/etc/wireless/mediatek/mt7986-ax6000.dbdc.b1.dat"
+ssid = "ApertureScience"
+auth_mode = "WPA2PSK"
+encryp_type = "AES"
+
+# ─────────────────────────────────────────────────────────────
+# Switches
+# ─────────────────────────────────────────────────────────────
+
+[devices.crs310_backbone]
+type = "switch"
+model = "MikroTik CRS310-1G-5S-4S+IN"
+ip = "192.168.4.2"
+site = "house1"
+ports = [
+    "sfp+1 → Omada SX3008F (10G trunk, 80m AOC)",
+    "sfp+2 → eastGate (10G compute)",
+    "etherX → northGate (Win/5090, 2.5G)",
+    "ether8 ← sporeGate eno1 (2.5G uplink)",
+]
+note = "Credentials unknown — needs physical reset (5s hold). Management at 192.168.4.2."
+
+[devices.omada_house2]
+type = "switch"
+model = "TP-Link Omada SX3008F"
+ip = "10.0.4.1"
+management_ip = "10.0.4.1"
+site = "house2"
+ports = [
+    "sfp+ ← CRS310 sfp+1 (10G trunk from backbone)",
+    "2.5G ports → compute towers, NUCs, fieldGate",
+]
+note = "Management at 10.0.4.1 (separate VLAN). Uplink 10G AOC from CRS310."
+
+[devices.sg605s_expansion]
+type = "switch"
+model = "TP-Link TL-SG605S-M2"
+ip = "192.168.4.251"
+site = "house2"
+ports = [
+    "port1 ← Omada (2.5G uplink)",
+    "port2 → Flint 2 (WiFi AP)",
+    "port3-5 → available",
+]
+note = "5-port 2.5G expansion off Omada for House 2 compute/WiFi"
+
+# ─────────────────────────────────────────────────────────────
+# Gateways
+# ─────────────────────────────────────────────────────────────
+
+[devices.bgw320_att]
+type = "gateway"
+model = "AT&T BGW320-505"
+ip = "192.168.1.254"
+site = "house1"
+note = "IP Passthrough active (Jun 22). Public IP passed to sporeGate. UDP port 51820 has mapping bug — use 51821 for WireGuard."
