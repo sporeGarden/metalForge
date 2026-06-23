@@ -50,7 +50,7 @@ note = "Credentials unknown — needs physical reset (5s hold). Management at 19
 [devices.omada_house2]
 type = "switch"
 model = "TP-Link Omada SX3008F"
-ip = "10.0.4.1"
+ip = "192.168.4.111"
 management_ip = "10.0.4.1"
 site = "house2"
 ports = [
@@ -62,14 +62,14 @@ note = "Management at 10.0.4.1 (separate VLAN). Uplink 10G AOC from CRS310."
 [devices.sg605s_expansion]
 type = "switch"
 model = "TP-Link TL-SG605S-M2"
-ip = "192.168.4.251"
+ip = "0.0.0.0"
 site = "house2"
 ports = [
     "port1 ← Omada (2.5G uplink)",
     "port2 → Flint 2 (WiFi AP)",
     "port3-5 → available",
 ]
-note = "5-port 2.5G expansion off Omada for House 2 compute/WiFi"
+note = "Unmanaged L2 switch — no IP stack, no ICMP response. Probe via downstream device reachability (Flint 2)."
 
 # ─────────────────────────────────────────────────────────────
 # Gateways

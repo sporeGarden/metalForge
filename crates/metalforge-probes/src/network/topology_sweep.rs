@@ -33,6 +33,7 @@ impl TopologySweepProbe {
         let device_targets: Vec<(String, String)> = device_registry
             .devices
             .iter()
+            .filter(|(_, spec)| spec.ip != "0.0.0.0")
             .map(|(name, spec)| (name.clone(), spec.ip.clone()))
             .collect();
 

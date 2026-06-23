@@ -11,13 +11,15 @@ use metalforge_types::probe::{ProbeCategory, ProbeCheck, ProbeMeta, ProbeResult,
 
 use crate::registry::Probe;
 
-/// Known service endpoints to probe (gate, port, service name).
+/// Known service endpoints to probe (gate, ip, port, service name).
+/// Only network-facing services — UDS-only primals (nestGate, etc.) are
+/// validated by primalSpring, not metalForge.
 const SERVICE_ENDPOINTS: &[(&str, &str, u16, &str)] = &[
     ("sporeGate", "192.168.4.1", 22, "SSH"),
-    ("sporeGate", "192.168.4.1", 9500, "nestGate"),
+    ("sporeGate", "192.168.4.1", 53, "dnsmasq DNS"),
     ("golgiBody", "10.13.37.1", 22, "SSH"),
     ("golgiBody", "10.13.37.1", 7700, "songBird federation"),
-    ("golgiBody", "10.13.37.1", 9500, "nestGate"),
+    ("golgiBody", "10.13.37.1", 2222, "Forgejo SSH"),
 ];
 
 pub struct ServicePortProbe {
