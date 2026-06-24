@@ -12,11 +12,12 @@
 [devices.flint2_house2]
 type = "wifi_ap"
 model = "GL-MT6000"
-firmware = "openwrt"
+firmware = "openwrt-glinet"
 ip = "192.168.4.250"
 ssh_user = "root"
 site = "house2"
-note = "MediaTek driver reads .dat files for radio config; firmware updates can overwrite SSID/auth fields"
+mac_bridge = "94:83:C4:E0:62:B0"
+note = "Bridge mode. DHCP from sporeGate via SG605S → Omada. MediaTek driver reads .dat files for radio config."
 
 [devices.flint2_house2.radios.band_2g]
 dat_path = "/etc/wireless/mediatek/mt7986-ax6000.dbdc.b0.dat"
@@ -30,22 +31,64 @@ ssid = "ApertureScience"
 auth_mode = "WPA2PSK"
 encryp_type = "AES"
 
+[devices.flint2_house1]
+type = "wifi_ap"
+model = "GL-MT6000"
+firmware = "openwrt-glinet-4.8.4"
+ip = "192.168.4.251"
+ssh_user = "root"
+site = "house1"
+mac_bridge = "94:83:C4:E0:63:5A"
+mac_wan = "94:83:C4:E0:63:58"
+serial = "7b9ae0d561478fa2"
+note = "Bridge mode. DHCP from sporeGate. Firewall disabled. Uplink: lan1 → CRS310 (2.5G). WAN port (eth1) empty, reserved for ATT emergency bypass."
+
+[devices.flint2_house1.radios.band_2g]
+dat_path = "/etc/wireless/mediatek/mt7986-ax6000.dbdc.b0.dat"
+ssid = "ApertureScience"
+auth_mode = "WPA2PSK"
+encryp_type = "AES"
+channel = 9
+
+[devices.flint2_house1.radios.band_5g]
+dat_path = "/etc/wireless/mediatek/mt7986-ax6000.dbdc.b1.dat"
+ssid = "ApertureScience"
+auth_mode = "WPA2PSK"
+encryp_type = "AES"
+channel = 44
+
+# Confirmed port mapping for GL-MT6000 (GL.iNet firmware 4.8.4)
+# Physical labels do NOT always match UCI names in WAN/LAN combo mode.
+[devices.flint2_house1.port_map]
+WAN = { uci = "eth1", speed_mbps = 2500, role = "wan_reserved", note = "Empty. Future ATT emergency bypass." }
+LAN1 = { uci = "lan1", speed_mbps = 2500, role = "uplink", note = "CRS310 backbone (2.5G confirmed)" }
+LAN2 = { uci = "lan2", speed_mbps = 1000, role = "available" }
+LAN3 = { uci = "lan3", speed_mbps = 1000, role = "available" }
+LAN4 = { uci = "lan4", speed_mbps = 1000, role = "available" }
+LAN5 = { uci = "lan5", speed_mbps = 1000, role = "available" }
+
 # ─────────────────────────────────────────────────────────────
 # Switches
 # ─────────────────────────────────────────────────────────────
 
 [devices.crs310_backbone]
 type = "switch"
-model = "MikroTik CRS310-1G-5S-4S+IN"
+model = "MikroTik CRS310-8G+2S+IN"
 ip = "192.168.4.2"
 site = "house1"
-ports = [
-    "sfp+1 → Omada SX3008F (10G trunk, 80m AOC)",
-    "sfp+2 → eastGate (10G compute)",
-    "etherX → northGate (Win/5090, 2.5G)",
-    "ether8 ← sporeGate eno1 (2.5G uplink)",
-]
-note = "Credentials unknown — needs physical reset (5s hold). Management at 192.168.4.2."
+note = "Credentials unknown — needs physical reset (5s hold). Management at 192.168.4.2. ALL 8 RJ45 ports are 2.5G."
+
+[devices.crs310_backbone.port_map]
+ether1 = { speed_mbps = 2500, role = "available" }
+ether2 = { speed_mbps = 2500, role = "available" }
+ether3 = { speed_mbps = 2500, role = "available" }
+ether4 = { speed_mbps = 2500, role = "available" }
+ether5 = { speed_mbps = 2500, role = "gate", note = "northGate (Win/5090)" }
+ether6 = { speed_mbps = 2500, role = "ap", note = "Flint 2 #2 House 1 (lan1)" }
+ether7 = { speed_mbps = 2500, role = "available" }
+ether8 = { speed_mbps = 2500, role = "uplink", note = "sporeGate eno1" }
+"sfp+1" = { speed_mbps = 10000, role = "trunk", note = "Omada SX3008F (80m AOC)" }
+"sfp+2" = { speed_mbps = 10000, role = "gate", note = "eastGate (10G compute)" }
 
 [devices.omada_house2]
 type = "switch"
