@@ -32,36 +32,44 @@ auth_mode = "WPA2PSK"
 encryp_type = "AES"
 
 [devices.flint2_house1]
-type = "wifi_ap"
+type = "router"
 model = "GL-MT6000"
 firmware = "openwrt-glinet-4.8.4"
-ip = "192.168.4.251"
+ip = "192.168.4.1"
 ssh_user = "root"
 site = "house1"
 mac_bridge = "94:83:C4:E0:63:5A"
 mac_wan = "94:83:C4:E0:63:58"
 serial = "7b9ae0d561478fa2"
-note = "Bridge mode. DHCP from sporeGate. Firewall disabled. Uplink: lan1 → CRS310 (2.5G). WAN port (eth1) empty, reserved for ATT emergency bypass."
+role = "edge_router"
+wan_ip = "162.226.225.148"
+wan_mode = "att_ip_passthrough"
+services = ["nat", "dhcp", "dns", "firewall", "wifi", "sovereign-dns-blocklist"]
+note = "Edge router (promoted Jun 27, Wave 127). ATT IP Passthrough to WAN MAC. NAT/DHCP/DNS/firewall. Sovereign DNS blocklist (91k rules). Port forwards to sporeGate for WG/SSH/HTTP/HTTPS/RustDesk/TURN/NestGate. LAN: 192.168.4.1/22. WAN: eth1 → ATT BGW320."
 
 [devices.flint2_house1.radios.band_2g]
 dat_path = "/etc/wireless/mediatek/mt7986-ax6000.dbdc.b0.dat"
-ssid = "ApertureScience"
+ssid = "Aperture Science"
 auth_mode = "WPA2PSK"
 encryp_type = "AES"
-channel = 9
+channel = 1
+role = "iot"
+note = "IoT devices, legacy compat. Standard non-overlapping ch1."
 
 [devices.flint2_house1.radios.band_5g]
 dat_path = "/etc/wireless/mediatek/mt7986-ax6000.dbdc.b1.dat"
-ssid = "ApertureScience"
+ssid = "BlackMesa"
 auth_mode = "WPA2PSK"
 encryp_type = "AES"
 channel = 44
+role = "user"
+note = "User devices, high-speed. HE80 WiFi 6."
 
 # Confirmed port mapping for GL-MT6000 (GL.iNet firmware 4.8.4)
 # Physical labels do NOT always match UCI names in WAN/LAN combo mode.
 [devices.flint2_house1.port_map]
-WAN = { uci = "eth1", speed_mbps = 2500, role = "wan_reserved", note = "Empty. Future ATT emergency bypass." }
-LAN1 = { uci = "lan1", speed_mbps = 2500, role = "uplink", note = "CRS310 backbone (2.5G confirmed)" }
+WAN = { uci = "eth1", speed_mbps = 2500, role = "wan", note = "ATT BGW320 uplink. IP Passthrough active." }
+LAN1 = { uci = "lan1", speed_mbps = 2500, role = "lan_trunk", note = "CRS310 backbone (2.5G, primary LAN distribution)" }
 LAN2 = { uci = "lan2", speed_mbps = 1000, role = "available" }
 LAN3 = { uci = "lan3", speed_mbps = 1000, role = "available" }
 LAN4 = { uci = "lan4", speed_mbps = 1000, role = "available" }
@@ -123,4 +131,18 @@ type = "gateway"
 model = "AT&T BGW320-505"
 ip = "192.168.1.254"
 site = "house1"
-note = "IP Passthrough active (Jun 22). Public IP passed to sporeGate. UDP port 51820 has mapping bug — use 51821 for WireGuard."
+note = "IP Passthrough active (Jun 27, Wave 127). Public IP passed to Flint H1 WAN MAC (94:83:C4:E0:63:58). WiFi disabled. UDP port 51820 has mapping bug — use 51821 for WireGuard."
+
+# ─────────────────────────────────────────────────────────────
+# Compute Nodes
+# ─────────────────────────────────────────────────────────────
+
+[devices.sporegate]
+type = "compute_node"
+model = "NUC (custom)"
+ip = "192.168.4.3"
+site = "house1"
+role = "compute"
+wg_ip = "10.13.37.2"
+services = ["wireguard_hub", "caddy", "forgejo", "rustdesk", "turn", "nestgate"]
+note = "Demoted from edge router Jun 27 (Wave 127). Ephemeral compute node — network survives unplug/reboot. No dnsmasq, no NAT. Gateway: Flint at .1. All inbound traffic port-forwarded from Flint."
